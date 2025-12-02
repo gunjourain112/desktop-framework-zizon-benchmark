@@ -1,6 +1,7 @@
 use iced::mouse;
 use iced::widget::canvas::{stroke, Cache, Geometry, Path, Program, Stroke};
 use iced::{Color, Point, Rectangle, Theme};
+use std::collections::VecDeque;
 
 // 차트 색상 정의 (Neon Colors)
 const NEON_CYAN: Color = Color::from_rgb(0.0, 1.0, 1.0);
@@ -8,12 +9,12 @@ const NEON_MAGENTA: Color = Color::from_rgb(1.0, 0.0, 1.0);
 const DARK_BG: Color = Color::from_rgb(0.1, 0.1, 0.1);
 
 pub struct CpuUsageChart {
-    pub data: Vec<f32>,
+    pub data: VecDeque<f32>,
     pub cache: Cache,
 }
 
 impl CpuUsageChart {
-    pub fn new(data: Vec<f32>) -> Self {
+    pub fn new(data: VecDeque<f32>) -> Self {
         Self {
             data,
             cache: Cache::new(),
