@@ -8,8 +8,8 @@ const NEON_MAGENTA: Color = Color::from_rgb(1.0, 0.0, 1.0);
 const DARK_BG: Color = Color::from_rgb(0.1, 0.1, 0.1);
 
 pub struct CpuUsageChart {
-    pub data: Vec<f32>,
-    pub cache: Cache,
+    data: Vec<f32>,
+    cache: Cache,
 }
 
 impl CpuUsageChart {
@@ -18,6 +18,17 @@ impl CpuUsageChart {
             data,
             cache: Cache::new(),
         }
+    }
+
+    /// Update the CPU usage data and clear the cache for redraw
+    pub fn update_data(&mut self, data: Vec<f32>) {
+        self.data = data;
+        self.cache.clear();
+    }
+
+    /// Clear the cache to force a redraw
+    pub fn clear_cache(&mut self) {
+        self.cache.clear();
     }
 }
 
@@ -76,9 +87,9 @@ impl<Message> Program<Message> for CpuUsageChart {
 }
 
 pub struct MemoryUsageChart {
-    pub used_memory: u64,
-    pub total_memory: u64,
-    pub cache: Cache,
+    used_memory: u64,
+    total_memory: u64,
+    cache: Cache,
 }
 
 impl MemoryUsageChart {
@@ -88,6 +99,18 @@ impl MemoryUsageChart {
             total_memory: total,
             cache: Cache::new(),
         }
+    }
+
+    /// Update the memory values and clear the cache for redraw
+    pub fn update_memory(&mut self, used: u64, total: u64) {
+        self.used_memory = used;
+        self.total_memory = total;
+        self.cache.clear();
+    }
+
+    /// Clear the cache to force a redraw
+    pub fn clear_cache(&mut self) {
+        self.cache.clear();
     }
 }
 

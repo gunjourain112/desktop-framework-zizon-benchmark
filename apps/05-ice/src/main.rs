@@ -50,10 +50,10 @@ impl Application for SystemMonitor {
 
         (
             SystemMonitor {
-                system,
-                cpu_history,
                 cpu_chart_cache: CpuUsageChart::new(cpu_history.clone()),
                 memory_chart_cache: MemoryUsageChart::new(0, 100),
+                system,
+                cpu_history,
             },
             Command::none(),
         )
@@ -76,14 +76,11 @@ impl Application for SystemMonitor {
                     self.cpu_history.remove(0);
                 }
 
-                self.cpu_chart_cache.data = self.cpu_history.clone();
-                self.cpu_chart_cache.cache.clear();
+                self.cpu_chart_cache.update_data(self.cpu_history.clone());
 
                 let used = self.system.used_memory();
                 let total = self.system.total_memory();
-                self.memory_chart_cache.used_memory = used;
-                self.memory_chart_cache.total_memory = total;
-                self.memory_chart_cache.cache.clear();
+                self.memory_chart_cache.update_memory(used, total);
 
                 Command::none()
             }
