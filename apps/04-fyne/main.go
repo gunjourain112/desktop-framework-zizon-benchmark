@@ -29,8 +29,8 @@ func main() {
 		// This callback runs in the monitor's background goroutine.
 		// We must update UI elements on the main thread.
 
-		// Capture current memory usage to display (simple read)
-		memUsage := mon.Stats.MemoryUsage
+		// Capture current memory usage to display (thread-safe read)
+		memUsage := mon.GetMemoryUsage()
 
 		// Schedule UI update
 		if drv := a.Driver(); drv != nil {

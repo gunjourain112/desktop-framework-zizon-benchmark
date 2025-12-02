@@ -89,7 +89,7 @@ func (r *donutRenderer) updateArc() {
 	r.bgCircle.Move(fyne.NewPos(float32(cx-radius), float32(cy-radius)))
 
 	// Calculate Arc
-	usage := r.donut.monitor.Stats.MemoryUsage
+	usage := r.donut.monitor.GetMemoryUsage()
 	if usage > 100 {
 		usage = 100
 	}

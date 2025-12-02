@@ -1,6 +1,7 @@
 package monitor
 
 import (
+	"sync"
 	"time"
 
 	"github.com/shirou/gopsutil/v4/cpu"
@@ -20,7 +21,8 @@ type SystemStats struct {
 // MonitorService handles system stats collection.
 type MonitorService struct {
 	CPUHistory *RingBuffer
-	Stats      SystemStats
+	stats      SystemStats
+	statsMu    sync.RWMutex
 	done       chan struct{}
 }
 
@@ -58,6 +60,22 @@ func (s *MonitorService) Stop() {
 	close(s.done)
 }
 
+// GetStats returns a copy of the current system stats.
+// This is safe for concurrent access.
+func (s *MonitorService) GetStats() SystemStats {
+	s.statsMu.RLock()
+	defer s.statsMu.RUnlock()
+	return s.stats
+}
+
+// GetMemoryUsage returns the current memory usage percentage.
+// This is safe for concurrent access.
+func (s *MonitorService) GetMemoryUsage() float64 {
+	s.statsMu.RLock()
+	defer s.statsMu.RUnlock()
+	return s.stats.MemoryUsage
+}
+
 func (s *MonitorService) updateStats() {
 	// CPU
 	// cpu.Percent blocks for the duration if called with non-zero duration.
@@ -78,15 +96,19 @@ func (s *MonitorService) updateStats() {
 	percent, err := cpu.Percent(0, false)
 	if err == nil && len(percent) > 0 {
 		val := percent[0]
-		s.Stats.CPUUsage = val
+		s.statsMu.Lock()
+		s.stats.CPUUsage = val
+		s.statsMu.Unlock()
 		s.CPUHistory.Add(val)
 	}
 
 	// Memory
 	v, err := mem.VirtualMemory()
 	if err == nil {
-		s.Stats.MemoryTotal = v.Total
-		s.Stats.MemoryUsed = v.Used
-		s.Stats.MemoryUsage = v.UsedPercent
+		s.statsMu.Lock()
+		s.stats.MemoryTotal = v.Total
+		s.stats.MemoryUsed = v.Used
+		s.stats.MemoryUsage = v.UsedPercent
+		s.statsMu.Unlock()
 	}
 }
