@@ -51,8 +51,8 @@ impl Application for SystemMonitor {
         (
             SystemMonitor {
                 system,
-                cpu_history: cpu_history.clone(),
-                cpu_chart_cache: CpuUsageChart::new(cpu_history),
+                cpu_history,
+                cpu_chart_cache: CpuUsageChart::new(cpu_history.clone()),
                 memory_chart_cache: MemoryUsageChart::new(0, 100),
             },
             Command::none(),
