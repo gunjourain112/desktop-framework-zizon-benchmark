@@ -107,6 +107,12 @@ func (r *donutRenderer) updateArc() {
 		segmentsNeeded = 1
 	}
 
+	// Early return if no segments needed to avoid division by zero
+	if segmentsNeeded == 0 {
+		r.segments = r.segments[:0]
+		return
+	}
+
 	// Ensure slice capacity
 	if len(r.segments) < segmentsNeeded {
 		for i := len(r.segments); i < segmentsNeeded; i++ {
