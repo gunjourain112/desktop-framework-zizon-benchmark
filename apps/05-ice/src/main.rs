@@ -1,6 +1,7 @@
 use iced::widget::{column, container, row, text, Canvas};
 use iced::{executor, Application, Command, Element, Length, Settings, Subscription, Theme, Color};
 use iced::time;
+use std::collections::VecDeque;
 use std::time::Duration;
 use sysinfo::{CpuRefreshKind, MemoryRefreshKind, RefreshKind, System};
 
@@ -21,7 +22,7 @@ pub fn main() -> iced::Result {
 
 struct SystemMonitor {
     system: System,
-    cpu_history: Vec<f32>,
+    cpu_history: VecDeque<f32>,
     cpu_chart_cache: chart::CpuUsageChart,
     memory_chart_cache: chart::MemoryUsageChart,
 }
@@ -46,13 +47,13 @@ impl Application for SystemMonitor {
         system.refresh_cpu();
         system.refresh_memory();
 
-        let cpu_history = vec![0.0; 60];
+        let cpu_history: VecDeque<f32> = vec![0.0; 60].into();
 
         (
             SystemMonitor {
                 system,
-                cpu_history,
-                cpu_chart_cache: CpuUsageChart::new(cpu_history.clone()),
+                cpu_history: cpu_history.clone(),
+                cpu_chart_cache: CpuUsageChart::new(cpu_history),
                 memory_chart_cache: MemoryUsageChart::new(0, 100),
             },
             Command::none(),
@@ -71,9 +72,9 @@ impl Application for SystemMonitor {
 
                 let global_cpu = self.system.global_cpu_info().cpu_usage();
 
-                self.cpu_history.push(global_cpu);
+                self.cpu_history.push_back(global_cpu);
                 if self.cpu_history.len() > 60 {
-                    self.cpu_history.remove(0);
+                    self.cpu_history.pop_front();
                 }
 
                 self.cpu_chart_cache.data = self.cpu_history.clone();
