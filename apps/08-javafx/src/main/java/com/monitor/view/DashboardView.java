@@ -24,7 +24,7 @@ public class DashboardView extends Pane {
         getChildren().add(canvas);
 
         // Redraw when data updates
-        viewModel.currentCpuLoadProperty().addListener(obs -> draw());
+        // viewModel.currentCpuLoadProperty().addListener(obs -> draw());
     }
 
     @Override
