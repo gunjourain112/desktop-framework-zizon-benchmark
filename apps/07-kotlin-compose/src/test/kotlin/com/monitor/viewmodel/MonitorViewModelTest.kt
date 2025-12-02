@@ -3,12 +3,14 @@ package com.monitor.viewmodel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.cancel
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.test.*
 import oshi.SystemInfo
 import kotlin.test.AfterTest
 import kotlin.test.BeforeTest
 import kotlin.test.Test
+import kotlin.test.assertEquals
 import kotlin.test.assertTrue
 
 @OptIn(ExperimentalCoroutinesApi::class)
@@ -41,5 +43,29 @@ class MonitorViewModelTest {
         // CPU history should be initialized with 0.0s
         assertTrue(state.cpuHistory.size == 60)
         assertTrue(state.cpuHistory.all { it == 0.0 })
+    }
+
+    @Test
+    fun `test close cancels coroutine scope and stops monitoring`() = runTest {
+        // Create a separate ViewModel for this test
+        val testViewModel = MonitorViewModel()
+        
+        // Get the initial state
+        val initialState = testViewModel.state.value
+        
+        // Call close to cancel the coroutine scope
+        testViewModel.close()
+        
+        // Wait a bit longer than the monitoring interval (1 second)
+        delay(1500)
+        
+        // Get the state after close and delay
+        val stateAfterClose = testViewModel.state.value
+        
+        // After close(), the monitoring loop should stop. The state should remain 
+        // the same because the monitoring coroutine is cancelled and not updating.
+        // We verify by comparing cpuHistory - if monitoring continued, cpuHistory would change
+        assertEquals(initialState.cpuHistory, stateAfterClose.cpuHistory,
+            "CPU history should not change after close() as monitoring should stop")
     }
 }
