@@ -35,7 +35,7 @@ class MonitorViewModel {
     private fun startMonitoring() {
         scope.launch {
             var prevTicks = processor.systemCpuLoadTicks
-            while (true) {
+            while (isActive) {
                 delay(1000)
                 val currentTicks = processor.systemCpuLoadTicks
                 val cpuLoad = processor.getSystemCpuLoadBetweenTicks(prevTicks) * 100
