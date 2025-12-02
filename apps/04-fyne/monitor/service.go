@@ -1,6 +1,7 @@
 package monitor
 
 import (
+	"sync"
 	"time"
 
 	"github.com/shirou/gopsutil/v4/cpu"
@@ -21,7 +22,9 @@ type SystemStats struct {
 type MonitorService struct {
 	CPUHistory *RingBuffer
 	Stats      SystemStats
+	StatsMu    sync.Mutex // Protects Stats field for concurrent access
 	done       chan struct{}
+	stopOnce   sync.Once
 }
 
 // NewMonitorService creates a new monitor.
@@ -54,8 +57,11 @@ func (s *MonitorService) Start(interval time.Duration, onUpdate func()) {
 }
 
 // Stop stops the background collection.
+// Safe to call multiple times.
 func (s *MonitorService) Stop() {
-	close(s.done)
+	s.stopOnce.Do(func() {
+		close(s.done)
+	})
 }
 
 func (s *MonitorService) updateStats() {
@@ -63,15 +69,19 @@ func (s *MonitorService) updateStats() {
 	percent, err := cpu.Percent(0, false)
 	if err == nil && len(percent) > 0 {
 		val := percent[0]
+		s.StatsMu.Lock()
 		s.Stats.CPUUsage = val
+		s.StatsMu.Unlock()
 		s.CPUHistory.Add(val)
 	}
 
 	// Memory
 	v, err := mem.VirtualMemory()
 	if err == nil {
+		s.StatsMu.Lock()
 		s.Stats.MemoryTotal = v.Total
 		s.Stats.MemoryUsed = v.Used
 		s.Stats.MemoryUsage = v.UsedPercent
+		s.StatsMu.Unlock()
 	}
 }
