@@ -47,6 +47,8 @@ func main() {
 		}
 	})
 
+	w.SetOnClosed(func() {
+		mon.Stop()
+	})
 	w.ShowAndRun()
-	mon.Stop()
 }
