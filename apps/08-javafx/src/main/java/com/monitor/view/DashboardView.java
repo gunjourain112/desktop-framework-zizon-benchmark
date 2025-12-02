@@ -17,6 +17,14 @@ public class DashboardView extends Pane {
     private static final Color MEM_COLOR = Color.MAGENTA;
     private static final Color TEXT_COLOR = Color.WHITE;
 
+    // Layout Constants
+    private static final double MARGIN = 40;
+    private static final double TITLE_FONT_SIZE = 20;
+    private static final double TITLE_OFFSET = 10;
+    private static final double TEXT_POSITION_OFFSET = 60;
+    private static final double DONUT_OUTER_RATIO = 0.8;
+    private static final double DONUT_INNER_RATIO = 0.6;
+
     public DashboardView(SystemViewModel viewModel) {
         this.viewModel = viewModel;
         this.canvas = new Canvas();
@@ -47,12 +55,11 @@ public class DashboardView extends Pane {
 
         // 2. Layout Calculation
         // Split screen: Left for CPU (Line Chart), Right for Memory (Donut)
-        double margin = 40;
-        double chartW = (w - margin * 3) / 2;
-        double chartH = h - margin * 2;
-        double leftX = margin;
-        double rightX = margin * 2 + chartW;
-        double topY = margin;
+        double chartW = (w - MARGIN * 3) / 2;
+        double chartH = h - MARGIN * 2;
+        double leftX = MARGIN;
+        double rightX = MARGIN * 2 + chartW;
+        double topY = MARGIN;
 
         drawCpuChart(gc, leftX, topY, chartW, chartH);
         drawMemoryChart(gc, rightX, topY, chartW, chartH);
@@ -61,8 +68,8 @@ public class DashboardView extends Pane {
     private void drawCpuChart(GraphicsContext gc, double x, double y, double w, double h) {
         // Title
         gc.setFill(TEXT_COLOR);
-        gc.setFont(new Font("Arial", 20));
-        gc.fillText("CPU Load (60s)", x, y - 10);
+        gc.setFont(new Font("Arial", TITLE_FONT_SIZE));
+        gc.fillText("CPU Load (60s)", x, y - TITLE_OFFSET);
 
         // Border
         gc.setStroke(Color.GRAY);
@@ -89,19 +96,19 @@ public class DashboardView extends Pane {
 
         // Current Value Text
         String currentVal = String.format("%.1f%%", viewModel.currentCpuLoadProperty().get() * 100);
-        gc.fillText(currentVal, x + w - 60, y + 20);
+        gc.fillText(currentVal, x + w - TEXT_POSITION_OFFSET, y + 20);
     }
 
     private void drawMemoryChart(GraphicsContext gc, double x, double y, double w, double h) {
         // Title
         gc.setFill(TEXT_COLOR);
-        gc.setFont(new Font("Arial", 20));
-        gc.fillText("Memory Usage", x, y - 10);
+        gc.setFont(new Font("Arial", TITLE_FONT_SIZE));
+        gc.fillText("Memory Usage", x, y - TITLE_OFFSET);
 
         // Center of donut
         double centerX = x + w / 2;
         double centerY = y + h / 2;
-        double radius = Math.min(w, h) / 2 * 0.8;
+        double radius = Math.min(w, h) / 2 * DONUT_OUTER_RATIO;
 
         // Data
         double usedPct = viewModel.memoryUsageProperty().get();
@@ -116,7 +123,7 @@ public class DashboardView extends Pane {
         gc.fillArc(centerX - radius, centerY - radius, radius * 2, radius * 2, 90, -usedAngle, javafx.scene.shape.ArcType.ROUND);
 
         // Cut out center to make it a Donut
-        double innerRadius = radius * 0.6;
+        double innerRadius = radius * DONUT_INNER_RATIO;
         gc.setFill(BG_COLOR);
         gc.fillOval(centerX - innerRadius, centerY - innerRadius, innerRadius * 2, innerRadius * 2);
 
