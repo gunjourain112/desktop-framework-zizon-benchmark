@@ -28,13 +28,15 @@ import java.util.concurrent.TimeUnit;
  * stop background monitoring, call {@link #stop()} when the ViewModel is no longer needed.
  */
 public class SystemViewModel {
+    private static final int CPU_HISTORY_SIZE = 60; // 60 seconds history
+
     private final SystemInfo systemInfo;
     private final HardwareAbstractionLayer hardware;
     private final CentralProcessor processor;
     private final GlobalMemory memory;
 
     private final DoubleProperty memoryUsage = new SimpleDoubleProperty(0.0);
-    private final double[] cpuHistory = new double[60]; // 60 seconds history
+    private final double[] cpuHistory = new double[CPU_HISTORY_SIZE];
     private int cpuHistoryIndex = 0;
 
     // Using a property to notify when new CPU data is available might be good,
