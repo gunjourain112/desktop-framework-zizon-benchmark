@@ -1,6 +1,7 @@
 use iced::widget::{column, container, row, text, Canvas};
 use iced::{executor, Application, Command, Element, Length, Settings, Subscription, Theme, Color};
 use iced::time;
+use std::sync::Arc;
 use std::time::Duration;
 use sysinfo::{CpuRefreshKind, MemoryRefreshKind, RefreshKind, System};
 
@@ -21,7 +22,7 @@ pub fn main() -> iced::Result {
 
 struct SystemMonitor {
     system: System,
-    cpu_history: Vec<f32>,
+    cpu_history: Arc<Vec<f32>>,
     cpu_chart_cache: chart::CpuUsageChart,
     memory_chart_cache: chart::MemoryUsageChart,
 }
@@ -46,12 +47,12 @@ impl Application for SystemMonitor {
         system.refresh_cpu();
         system.refresh_memory();
 
-        let cpu_history = vec![0.0; 60];
+        let cpu_history = Arc::new(vec![0.0; 60]);
 
         (
             SystemMonitor {
                 system,
-                cpu_history: cpu_history.clone(),
+                cpu_history: Arc::clone(&cpu_history),
                 cpu_chart_cache: CpuUsageChart::new(cpu_history),
                 memory_chart_cache: MemoryUsageChart::new(0, 100),
             },
@@ -71,12 +72,16 @@ impl Application for SystemMonitor {
 
                 let global_cpu = self.system.global_cpu_info().cpu_usage();
 
-                self.cpu_history.push(global_cpu);
-                if self.cpu_history.len() > 60 {
-                    self.cpu_history.remove(0);
+                // Use Arc::make_mut for efficient copy-on-write semantics
+                // This avoids cloning when there's only one reference
+                let history = Arc::make_mut(&mut self.cpu_history);
+                history.push(global_cpu);
+                if history.len() > 60 {
+                    history.remove(0);
                 }
 
-                self.cpu_chart_cache.data = self.cpu_history.clone();
+                // Share the same Arc with the chart - no cloning needed
+                self.cpu_chart_cache.data = Arc::clone(&self.cpu_history);
                 self.cpu_chart_cache.cache.clear();
 
                 let used = self.system.used_memory();
