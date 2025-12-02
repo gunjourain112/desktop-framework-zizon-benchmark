@@ -94,10 +94,9 @@ public class SystemViewModel {
         double usedRatio = (double) (total - available) / total;
 
         Platform.runLater(() -> {
-            // Update CPU History Ring Buffer style or Shift?
-            // Shifting is easier for drawing: [0] is oldest, [59] is newest.
-            System.arraycopy(cpuHistory, 1, cpuHistory, 0, cpuHistory.length - 1);
-            cpuHistory[cpuHistory.length - 1] = load;
+            // Update CPU History using Ring Buffer approach (O(1) instead of O(n))
+            cpuHistory[cpuHistoryIndex] = load;
+            cpuHistoryIndex = (cpuHistoryIndex + 1) % cpuHistory.length;
 
             currentCpuLoad.set(load);
             memoryUsage.set(usedRatio);
@@ -110,6 +109,15 @@ public class SystemViewModel {
 
     public double[] getCpuHistory() {
         return Arrays.copyOf(cpuHistory, cpuHistory.length);
+    }
+
+    /**
+     * Returns the current index in the ring buffer.
+     * This index points to the next position to be written,
+     * which means (index - 1 + length) % length is the newest value.
+     */
+    public int getCpuHistoryIndex() {
+        return cpuHistoryIndex;
     }
 
     public DoubleProperty currentCpuLoadProperty() {

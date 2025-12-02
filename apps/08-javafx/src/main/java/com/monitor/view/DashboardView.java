@@ -70,15 +70,18 @@ public class DashboardView extends Pane {
         gc.strokeRect(x, y, w, h);
 
         double[] history = viewModel.getCpuHistory();
+        int startIndex = viewModel.getCpuHistoryIndex(); // Ring buffer: this is the oldest value
         int count = history.length;
         double stepX = w / (count - 1);
 
-        // Draw Line
+        // Draw Line - reading from ring buffer (oldest to newest)
         gc.setStroke(CPU_COLOR);
         gc.setLineWidth(2);
         gc.beginPath();
         for (int i = 0; i < count; i++) {
-            double val = history[i]; // 0.0 to 1.0
+            // Read from ring buffer: start at startIndex (oldest) and wrap around
+            int bufferIndex = (startIndex + i) % count;
+            double val = history[bufferIndex]; // 0.0 to 1.0
             double px = x + i * stepX;
             double py = y + h - (val * h); // Invert Y
 
