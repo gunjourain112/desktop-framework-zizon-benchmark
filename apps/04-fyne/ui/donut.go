@@ -61,8 +61,7 @@ func (r *donutRenderer) BackgroundColor() color.Color {
 func (r *donutRenderer) Objects() []fyne.CanvasObject {
 	// Return background circle + segments
 	objs := make([]fyne.CanvasObject, 0, len(r.segments)+1)
-	// Actually, we don't want a filled background circle, we want a "track".
-	// Since Fyne Circle can check StrokeWidth, let's use that for background track.
+	// The background circle is rendered as a stroke-only "track" to represent the donut's base.
 	objs = append(objs, r.bgCircle)
 	for _, l := range r.segments {
 		objs = append(objs, l)
