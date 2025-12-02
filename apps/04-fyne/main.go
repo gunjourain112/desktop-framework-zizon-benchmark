@@ -43,7 +43,7 @@ func main() {
 				donutWidget.Refresh()
 				memLabel.Text = fmt.Sprintf("%.1f%%", memUsage)
 				memLabel.Refresh()
-			}, false)
+			})
 		}
 	})
 
