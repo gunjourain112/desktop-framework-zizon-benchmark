@@ -12,6 +12,21 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 
+/**
+ * ViewModel for system metrics in the MVVM pattern.
+ * <p>
+ * This class exposes system CPU and memory usage metrics as JavaFX properties,
+ * suitable for binding to UI controls in the View. It manages a background thread
+ * that periodically samples system metrics and updates the properties.
+ * <p>
+ * <b>Threading model:</b> Metric sampling and history updates are performed on a background
+ * thread (via {@link ScheduledExecutorService}), but all JavaFX property modifications
+ * are dispatched to the JavaFX Application Thread using {@link javafx.application.Platform#runLater(Runnable)}.
+ * This ensures thread safety for UI bindings.
+ * <p>
+ * <b>Lifecycle:</b> To begin monitoring, call {@link #start()}. To clean up resources and
+ * stop background monitoring, call {@link #stop()} when the ViewModel is no longer needed.
+ */
 public class SystemViewModel {
     private final SystemInfo systemInfo;
     private final HardwareAbstractionLayer hardware;
