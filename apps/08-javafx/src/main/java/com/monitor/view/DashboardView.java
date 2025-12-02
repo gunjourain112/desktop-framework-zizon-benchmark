@@ -1,7 +1,6 @@
 package com.monitor.view;
 
 import com.monitor.viewmodel.SystemViewModel;
-import javafx.animation.AnimationTimer;
 import javafx.scene.canvas.Canvas;
 import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.layout.Pane;
