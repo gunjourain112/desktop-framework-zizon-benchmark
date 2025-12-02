@@ -8,6 +8,7 @@ import oshi.hardware.CentralProcessor;
 import oshi.hardware.GlobalMemory;
 import oshi.hardware.HardwareAbstractionLayer;
 
+import java.util.Arrays;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
@@ -106,7 +107,7 @@ public class SystemViewModel {
     }
 
     public double[] getCpuHistory() {
-        return cpuHistory;
+        return Arrays.copyOf(cpuHistory, cpuHistory.length);
     }
 
     public DoubleProperty currentCpuLoadProperty() {
