@@ -5,7 +5,7 @@
 
 use std::thread;
 use std::time::Duration;
-use tauri::{Manager, Emitter};
+use tauri::Emitter;
 use sysinfo::{CpuRefreshKind, RefreshKind, System, MemoryRefreshKind};
 use serde::Serialize;
 
@@ -45,7 +45,7 @@ pub fn run() {
 
             thread::spawn(move || {
                 let mut sys = System::new_with_specifics(
-                    RefreshKind::new()
+                    RefreshKind::nothing()
                         .with_cpu(CpuRefreshKind::everything())
                         .with_memory(MemoryRefreshKind::everything()),
                 );
@@ -58,7 +58,7 @@ pub fn run() {
                     sys.refresh_cpu_all();
                     sys.refresh_memory();
 
-                    let cpu_usage = sys.global_cpu_info().cpu_usage();
+                    let cpu_usage = sys.global_cpu_usage();
                     let total_memory = sys.total_memory();
                     let used_memory = sys.used_memory();
                     let free_memory = sys.free_memory();
