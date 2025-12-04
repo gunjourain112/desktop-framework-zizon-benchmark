@@ -1,5 +1,55 @@
+# Node.js
 node_modules/
 dist/
 dist-electron/
 release/
 *.log
+
+# Rust
+target/
+Cargo.lock
+
+# Go
+vendor/
+
+# Java/Kotlin
+.gradle/
+build/
+bin/
+*.class
+
+# .NET
+bin/
+obj/
+*.dll
+*.exe
+
+# Flutter
+.dart_tool/
+.flutter-plugins
+.flutter-plugins-dependencies
+.packages
+pubspec.lock
+
+# Tauri
+src-tauri/target/
+src-tauri/gen/
+
+# Build outputs
+*.app
+*.dmg
+*.deb
+*.rpm
+*.msi
+*.AppImage
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# OS
+.DS_Store
+Thumbs.db
